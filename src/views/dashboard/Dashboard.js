@@ -53,14 +53,14 @@ const Dashboard = () => {
                 </CCarouselCaption>
               </CCarouselItem>
               <CCarouselItem>
-                <img className="d-block w-100" src={VueImg} alt="slide 3" />
+                <img className="d-block w-100" src={ReactImg} alt="slide 4" />
                 <CCarouselCaption className="d-none d-md-block">
                   <h5>Cuarta imagen aleatoria</h5>
                   <p>Texto aleatorio 4</p>
                 </CCarouselCaption>
               </CCarouselItem>
               <CCarouselItem>
-                <img className="d-block w-100" src={VueImg} alt="slide 3" />
+                <img className="d-block w-100" src={AngularImg} alt="slide 5" />
                 <CCarouselCaption className="d-none d-md-block">
                   <h5>Quinta imagen aleatoria</h5>
                   <p>Texto aleatorio 5</p>

@@ -12,12 +12,14 @@ import {
   CFormInput,
 } from '@coreui/react'
 import Moment from 'moment'
+import { Redirect, useHistory } from 'react-router-dom'
 
 const Formularios = () => {
   const [nombre, setNombre] = useState('')
   const [apellidos, setApellidos] = useState('')
   const [cumpleaños, setCumpleaños] = useState('')
   const [clienteObjeto, setClienteObjeto] = useState([])
+  const history = useHistory()
 
   const handleChange = async (e) => {
     e.preventDefault()
@@ -37,9 +39,10 @@ const Formularios = () => {
           'Content-Type': 'application/json',
         },
       })
-      console.log(respuesta)
+      // console.log(respuesta)
       const resultado = await respuesta.json()
-      console.log(resultado)
+      //console.log(resultado)
+      history.push('/empleados')
     } catch (error) {
       console.log('error', error)
     }
