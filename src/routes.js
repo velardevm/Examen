@@ -6,7 +6,7 @@ const Formulario = React.lazy(() => import('./views/forms/Formularios'))
 //Navegacion
 const Carousel = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Empleados = React.lazy(() => import('./views/theme/colors/Colors'))
-const Grupos = React.lazy(() => import('./views/theme/typography/Typography'))
+const Grupos = React.lazy(() => import('./views/theme/Grupos'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },

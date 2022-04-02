@@ -1,0 +1,22 @@
+.App {
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.Droppable {
+    border: 1px solid #888;
+    padding: 15px;
+    background: #eee;
+}
+
+.Draggable {
+    border: 1px solid #888;
+    padding: 15px;
+    margin: 5px;
+    background: #fafafa;
+}
+
+#div3 {
+    overflow-y: scroll;
+    margin-bottom: 5px;
+}
