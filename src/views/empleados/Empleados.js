@@ -20,7 +20,7 @@ import {
 } from '@coreui/react'
 import { Link } from 'react-router-dom'
 
-const Colors = () => {
+const Empleados = () => {
   const ITEMS_PAGE = 10
   const [clientes, setClientes] = useState([])
   const [currentPage, setCurrentPage] = useState(0)
@@ -115,4 +115,4 @@ const Colors = () => {
   )
 }
 
-export default Colors
+export default Empleados
