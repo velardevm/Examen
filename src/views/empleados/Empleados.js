@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import {
-  CAvatar,
   CButton,
-  CButtonGroup,
-  CBadge,
   CCard,
   CCardBody,
-  CCardFooter,
   CPaginationItem,
   CCol,
   CPagination,

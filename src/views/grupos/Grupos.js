@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import './styles.css'
 import { Droppable, Draggable } from 'react-tiny-drag-drop'
+import IconButton from '@mui/material/IconButton'
+import DeleteIcon from '@mui/icons-material/Delete'
+import Button from '@mui/material/Button'
+import SendIcon from '@mui/icons-material/Send'
 import {
   CCard,
   CCardBody,
   CCol,
-  CCardHeader,
+  CButton,
   CRow,
-  CListGroup,
-  CListGroupItem,
   CFormLabel,
   CFormInput,
   CFormCheck,
 } from '@coreui/react'
+import Checkbox from '../../components/Checkbox'
 
-const Typography = () => {
+const Grupos = () => {
   const [grupos, setGrupos] = useState([])
   const [tablaGrupos, setTablaGrupos] = useState([])
   const [busqueda, setBusqueda] = useState('')
-
-  const [groupA, setGroupA] = useState(['Noel', 'Joel', 'Boel'])
-  const [groupEmployees, setGroupEmployees] = useState([])
   const [groupByEmployees, setGroupByEmployees] = useState([])
   const [groupTitle, setGroupTitle] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isCheckAll, setIsCheckAll] = useState(false)
+  const [isCheck, setIsCheck] = useState([])
 
   useEffect(() => {
     const obtenerClientes = async () => {
@@ -45,6 +48,18 @@ const Typography = () => {
     filtrar(e.target.value)
   }
 
+  const showInConsole = (e) => {
+    if (isCheckAll === true) {
+      console.log('===EMPLEADOS===')
+      groupByEmployees.map((item) => console.log(item.name))
+    } else {
+      console.log('===EMPLEADOS===')
+      isCheck.forEach(function (elemento) {
+        console.log(elemento)
+      })
+    }
+  }
+
   const filtrar = (busqueda) => {
     let restultados = tablaGrupos.filter((elemento) => {
       if (elemento.name.toString().toLowerCase().includes(busqueda.toLowerCase())) {
@@ -55,59 +70,38 @@ const Typography = () => {
   }
 
   const handleDropEmployees = useFunction((groupName, currentKey, currentContext) => {
-    console.log('currentKey', currentKey)
+    //Validar si ya se ha añadido el grupo
+    if (currentKey === groupTitle) return alert('El grupo ya ha sido añadido anteriormente')
     setGroupTitle(currentKey)
+    setIsCheck([])
     let a = [...grupos]
 
-    // Remove the dropped item if found in group A
     a.forEach((v) => {
       if (currentKey === v.name) {
         let id = v.id
-        console.log(id)
-        try {
-          const url = `https://6edeayi7ch.execute-api.us-east-1.amazonaws.com/v1/examen/employees/:cesar/getByGroup?id=${id}`
-          fetch(url)
-            .then((response) => response.json())
-            .then((data) => setGroupByEmployees(data.data.employees))
-        } catch (error) {
-          console.log('error', error)
-        }
+
+        const url = `https://6edeayi7ch.execute-api.us-east-1.amazonaws.com/v1/examen/employees/:cesar/getByGroup?id=${id}`
+        fetch(url)
+          .then((response) => {
+            if (response.status == '200') {
+              response.json().then((res) => {
+                setErrorMessage('')
+                setGroupByEmployees(res.data.employees)
+              })
+            } else if (response.status == '500') {
+              setErrorMessage('El grupo no cuenta con registros')
+              return
+            }
+          })
+          .catch((err) => {
+            console.log(err, 'error')
+          })
+        setIsCheckAll(true)
       }
     })
   })
 
   const handleDropGroups = useFunction((groupName, currentKey, currentContext) => {
-    console.log(currentContext)
-    // Copy state variables to new, local variables to work with.
-    let a = [...groupA]
-    let b = [...groupEmployees]
-
-    // Remove the dropped item if found in group A
-    a.forEach((v, i) => {
-      if (currentKey === v) {
-        a.splice(i, 1)
-      }
-    })
-
-    // Remove the dropped item if found in group B
-    b.forEach((v, i) => {
-      if (currentKey === v) {
-        b.splice(i, 1)
-      }
-    })
-
-    // Items will always be added to the bottom in this simple demo.
-    // A Droppable can be added to each Draggable to determine sort order in
-    // the group, but that's out of scope for this demo.
-    if (groupName === 'a') {
-      a.push(currentKey)
-    } else {
-      b.push(currentKey)
-    }
-
-    // Update state
-    setGroupA(a)
-    setGroupEmployees(b)
     setGroupTitle(currentKey)
   })
 
@@ -116,7 +110,6 @@ const Typography = () => {
    * @param {*} list
    */
   const renderList = (list) => {
-    console.log('ejecutando a')
     return list.map((item) => (
       <Draggable key={item.id} context={context} dataKey={item.name}>
         <div className="Draggable">{item.name}</div>
@@ -124,17 +117,57 @@ const Typography = () => {
     ))
   }
 
-  const renderCheckList = (list) => {
-    return list.map((name) => (
-      <CFormCheck id="defaultCheck1" label={name} key={name} className="another" />
-    ))
+  const handleClick = (e) => {
+    const { id, checked, name } = e.target
+    setIsCheckAll(false)
+    setIsCheck([...isCheck, name])
+    if (!checked) {
+      setIsCheck(isCheck.filter((item) => item !== name))
+    }
+  }
+
+  const renderCheckList = groupByEmployees.map(({ id, name }) => {
+    let idString = name.toString()
+    return (
+      <>
+        <CCol md={12}>
+          <Checkbox
+            key={idString}
+            type="checkbox"
+            name={name}
+            id={idString}
+            handleClick={handleClick}
+            isChecked={isCheck.includes(idString)}
+            isCheckAll={isCheckAll}
+          />
+          {name}
+        </CCol>
+      </>
+    )
+  })
+
+  const cleanTarget = () => {
+    setGroupTitle('')
+    setGroupByEmployees([])
+    setErrorMessage('')
+  }
+
+  const handleSelectAll = () => {
+    setIsCheckAll(!isCheckAll)
+    setIsCheck(groupByEmployees.map((li) => li.name.toString()))
+    if (isCheckAll) {
+      setIsCheck([])
+    }
   }
 
   const context = 'names'
 
-  /**
-   * Render
-   */
+  const divStyle = {
+    overflowY: 'scroll',
+    height: '250px',
+    position: 'relative',
+  }
+
   return (
     <>
       <CRow>
@@ -180,10 +213,45 @@ const Typography = () => {
                 }}
               >
                 <div className="Droppable">
-                  <h4>{groupTitle === '' ? 'Arrastra grupo' : groupTitle}</h4>
-                  {renderCheckList(groupEmployees)}
+                  <CRow>
+                    <CCol md={1} style={{ marginTop: '6px' }}>
+                      {groupTitle === '' ? null : (
+                        <Checkbox
+                          id="selectAll"
+                          type="checkbox"
+                          name="selectAll"
+                          handleClick={handleSelectAll}
+                          isChecked={isCheckAll}
+                          isCheckAll={isCheckAll}
+                        />
+                      )}
+                    </CCol>
+                    <CCol md={9} style={{ marginTop: '5px' }}>
+                      <h5>{groupTitle === '' ? 'Arrastra grupo' : groupTitle}</h5>
+                    </CCol>
+                    <CCol md={2}>
+                      <IconButton aria-label="delete" onClick={cleanTarget}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </CCol>
+                  </CRow>
+                  <CCol md={12} style={{ marginTop: '15px' }}>
+                    <div style={divStyle}>
+                      {errorMessage === '' ? renderCheckList : <p>{errorMessage}</p>}
+                    </div>
+                  </CCol>
                 </div>
               </Droppable>
+              <CCol xs={12} md={12} lg={12} align="end">
+                <Button
+                  style={{ marginTop: '15px' }}
+                  variant="contained"
+                  endIcon={<SendIcon />}
+                  onClick={showInConsole}
+                >
+                  Continuar
+                </Button>
+              </CCol>
             </CCardBody>
           </CCard>
         </CCol>
@@ -209,4 +277,4 @@ function useFunction(callback) {
   }, [])
 }
 
-export default Typography
+export default Grupos

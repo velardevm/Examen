@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
   CRow,
-  CAccordion,
   CForm,
   CButton,
   CFormLabel,
   CFormInput,
 } from '@coreui/react'
 import Moment from 'moment'
-import { Redirect, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 const Formularios = () => {
   const [nombre, setNombre] = useState('')
   const [apellidos, setApellidos] = useState('')
   const [cumpleaños, setCumpleaños] = useState('')
-  const [clienteObjeto, setClienteObjeto] = useState([])
   const history = useHistory()
 
   const handleChange = async (e) => {
     e.preventDefault()
     const objetoCliente = {
-      name: nombre,
-      last_name: apellidos,
+      name: apellidos,
+      last_name: nombre,
       birthday: Moment(cumpleaños).format('YYYY/MM/DD'),
     }
     console.log('objetoCliente', objetoCliente)
