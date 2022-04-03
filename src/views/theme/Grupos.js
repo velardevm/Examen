@@ -20,7 +20,9 @@ const Typography = () => {
   const [busqueda, setBusqueda] = useState('')
 
   const [groupA, setGroupA] = useState(['Noel', 'Joel', 'Boel'])
-  const [groupB, setGroupB] = useState([])
+  const [groupEmployees, setGroupEmployees] = useState([])
+  const [groupByEmployees, setGroupByEmployees] = useState([])
+  const [groupTitle, setGroupTitle] = useState('')
 
   useEffect(() => {
     const obtenerClientes = async () => {
@@ -52,13 +54,33 @@ const Typography = () => {
     setGrupos(restultados)
   }
 
-  /**
-   * Callback function for handling of drop events
-   */
-  const handleDrop = useFunction((groupName, currentKey, currentContext) => {
+  const handleDropEmployees = useFunction((groupName, currentKey, currentContext) => {
+    console.log('currentKey', currentKey)
+    setGroupTitle(currentKey)
+    let a = [...grupos]
+
+    // Remove the dropped item if found in group A
+    a.forEach((v) => {
+      if (currentKey === v.name) {
+        let id = v.id
+        console.log(id)
+        try {
+          const url = `https://6edeayi7ch.execute-api.us-east-1.amazonaws.com/v1/examen/employees/:cesar/getByGroup?id=${id}`
+          fetch(url)
+            .then((response) => response.json())
+            .then((data) => setGroupByEmployees(data.data.employees))
+        } catch (error) {
+          console.log('error', error)
+        }
+      }
+    })
+  })
+
+  const handleDropGroups = useFunction((groupName, currentKey, currentContext) => {
+    console.log(currentContext)
     // Copy state variables to new, local variables to work with.
     let a = [...groupA]
-    let b = [...groupB]
+    let b = [...groupEmployees]
 
     // Remove the dropped item if found in group A
     a.forEach((v, i) => {
@@ -85,7 +107,8 @@ const Typography = () => {
 
     // Update state
     setGroupA(a)
-    setGroupB(b)
+    setGroupEmployees(b)
+    setGroupTitle(currentKey)
   })
 
   /**
@@ -93,6 +116,7 @@ const Typography = () => {
    * @param {*} list
    */
   const renderList = (list) => {
+    console.log('ejecutando a')
     return list.map((item) => (
       <Draggable key={item.id} context={context} dataKey={item.name}>
         <div className="Draggable">{item.name}</div>
@@ -101,7 +125,6 @@ const Typography = () => {
   }
 
   const renderCheckList = (list) => {
-    console.log('list', list)
     return list.map((name) => (
       <CFormCheck id="defaultCheck1" label={name} key={name} className="another" />
     ))
@@ -127,32 +150,6 @@ const Typography = () => {
             />
           </CCol>
         </CCol>
-        <CCol xs={6}>
-          <CCard className="mb-4">
-            <CCardHeader>Bar Chart</CCardHeader>
-            <CCardBody>
-              {grupos.map((item) => (
-                <CListGroup key={item.id}>
-                  <CListGroupItem>{item.name}</CListGroupItem>
-                </CListGroup>
-              ))}
-            </CCardBody>
-          </CCard>
-        </CCol>
-        <CCol xs={6}>
-          <CCard className="mb-4">
-            <CCardHeader>Line Chart</CCardHeader>
-            <CCardBody>
-              <CListGroup>
-                <CListGroupItem>Cras justo odio</CListGroupItem>
-                <CListGroupItem>Dapibus ac facilisis in</CListGroupItem>
-                <CListGroupItem>Morbi leo risus</CListGroupItem>
-                <CListGroupItem>Porta ac consectetur ac</CListGroupItem>
-                <CListGroupItem>Vestibulum at eros</CListGroupItem>
-              </CListGroup>
-            </CCardBody>
-          </CCard>
-        </CCol>
       </CRow>
 
       <CRow>
@@ -162,7 +159,7 @@ const Typography = () => {
               <Droppable
                 context={context}
                 onDrop={(currentKey, currentContext) => {
-                  handleDrop('a', currentKey, currentContext)
+                  handleDropGroups('a', currentKey, currentContext)
                 }}
               >
                 <div className="Droppable">
@@ -179,12 +176,12 @@ const Typography = () => {
               <Droppable
                 context={context}
                 onDrop={(currentKey, currentContext) => {
-                  handleDrop('b', currentKey, currentContext)
+                  handleDropEmployees('b', currentKey, currentContext)
                 }}
               >
                 <div className="Droppable">
-                  <h4>Group B</h4>
-                  {renderCheckList(groupB)}
+                  <h4>{groupTitle === '' ? 'Arrastra grupo' : groupTitle}</h4>
+                  {renderCheckList(groupEmployees)}
                 </div>
               </Droppable>
             </CCardBody>
